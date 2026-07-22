@@ -1,10 +1,13 @@
 package main
 
 import (
+	"embed"
+	"io/fs"
 	"log"
 	"os"
 
 	"portfolio-backend/config"
+	"portfolio-backend/controllers"
 	"portfolio-backend/middleware"
 	"portfolio-backend/models"
 	"portfolio-backend/routes"
@@ -12,6 +15,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 )
+
+//go:embed admin/*
+var adminFiles embed.FS
 
 func main() {
 	err := godotenv.Load()
@@ -27,6 +33,10 @@ func main() {
 	app.Use(middleware.CORSMiddleware())
 	routes.SetupRoutes(app)
 
+	// Serve embedded admin panel di /admin
+	adminSubFS, _ := fs.Sub(adminFiles, "admin")
+	controllers.SetupAdminRoutes(app, adminSubFS)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -34,3 +44,4 @@ func main() {
 
 	log.Fatal(app.Listen(":" + port))
 }
+

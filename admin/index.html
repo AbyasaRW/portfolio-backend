@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel — Portfolio Backend</title>
+    <style>
+        /* ===== CSS Reset & Base ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-card: rgba(15, 15, 25, 0.8);
+            --bg-input: rgba(20, 20, 35, 0.9);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(99, 130, 255, 0.4);
+            --text-primary: #e8e8f0;
+            --text-secondary: #8888a8;
+            --text-muted: #555570;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --danger: #ef4444;
+            --danger-hover: #f87171;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: 200ms ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ===== Layout ===== */
+        .app {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, var(--accent), #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions { display: flex; gap: 12px; align-items: center; }
+
+        /* ===== Buttons ===== */
+        .btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all var(--transition);
+            background: transparent;
+            color: var(--text-primary);
+        }
+        .btn:hover { border-color: var(--border-hover); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.3); border-color: var(--danger); }
+
+        .btn-warning {
+            background: rgba(245, 158, 11, 0.15);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: #fcd34d;
+        }
+        .btn-warning:hover { background: rgba(245, 158, 11, 0.3); border-color: var(--warning); }
+
+        .btn-ghost {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--border);
+        }
+        .btn-ghost:hover { background: rgba(255,255,255,0.1); }
+
+        .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+
+        /* ===== Inputs ===== */
+        input, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: border-color var(--transition);
+            outline: none;
+        }
+        input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        input::placeholder, textarea::placeholder { color: var(--text-muted); }
+        textarea { resize: vertical; min-height: 100px; }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+
+        /* ===== Cards ===== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            backdrop-filter: blur(20px);
+        }
+
+        /* ===== Login ===== */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-card h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .login-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+        .login-card form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* ===== Notification ===== */
+        .notification {
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            margin-bottom: 16px;
+            border: 1px solid;
+            animation: slideDown 0.3s ease;
+        }
+        .notification.error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+        .notification.success {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+            color: #86efac;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== Dashboard ===== */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .dashboard-header h2 { font-size: 1.25rem; font-weight: 700; }
+
+        /* ===== Form Grid ===== */
+        .form-card { margin-bottom: 24px; }
+        .form-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-grid .full-width { grid-column: 1 / -1; }
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding-top: 16px;
+            margin-top: 8px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ===== Table ===== */
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead tr {
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            padding: 14px 16px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            text-align: left;
+        }
+        td {
+            padding: 14px 16px;
+            font-size: 0.875rem;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .td-title { font-weight: 600; color: white; }
+        .td-stack { font-family: 'Courier New', monospace; font-size: 0.8rem; color: var(--accent-hover); }
+        .td-desc {
+            max-width: 280px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-secondary);
+        }
+        .td-actions { display: flex; gap: 8px; justify-content: center; }
+
+        .thumb {
+            width: 56px;
+            height: 40px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            object-fit: cover;
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .thumb-placeholder { font-size: 0.6rem; color: var(--text-muted); }
+
+        /* ===== Spinner ===== */
+        .spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 48px;
+            color: var(--text-secondary);
+        }
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px;
+            color: var(--text-muted);
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .app { padding: 16px; }
+            header h1 { font-size: 1.1rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .td-desc { display: none; }
+            .card { padding: 20px; }
+        }
+
+        /* ===== Utility ===== */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="app" id="app">
+        <!-- Header -->
+        <header>
+            <h1>⚙ Admin Panel</h1>
+            <div class="header-actions">
+                <a href="/" class="btn btn-ghost btn-sm" style="text-decoration:none;">← Portfolio</a>
+                <button class="btn btn-danger btn-sm hidden" id="logoutBtn" onclick="handleLogout()">Logout</button>
+            </div>
+        </header>
+
+        <!-- Notifications -->
+        <div id="notifications"></div>
+
+        <!-- Login Section -->
+        <div id="loginSection" class="login-container">
+            <div class="card login-card">
+                <h2>Masuk Admin</h2>
+                <p>Silakan login untuk mengelola project</p>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" placeholder="Masukkan username" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Masukkan password" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="loginSubmitBtn">Sign In</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="hidden">
+            <div class="dashboard-header">
+                <h2>Project List</h2>
+                <button class="btn btn-primary btn-sm" id="toggleFormBtn" onclick="toggleForm()">+ Add New Project</button>
+            </div>
+
+            <!-- Project Form -->
+            <div id="formCard" class="card form-card hidden">
+                <h3 id="formTitle">Create New Project</h3>
+                <form onsubmit="handleSubmitProject(event)" class="form-grid">
+                    <div class="form-group">
+                        <label for="f_title">Project Title *</label>
+                        <input type="text" id="f_title" placeholder="e.g. Sistem Pemesanan Vape" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="f_stack">Tech Stack *</label>
+                        <input type="text" id="f_stack" placeholder="e.g. Next.js, Go, PostgreSQL" required />
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="f_desc">Description *</label>
+                        <textarea id="f_desc" placeholder="Tuliskan deskripsi lengkap project..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="f_link">Project Link (URL)</label>
+                        <input type="url" id="f_link" placeholder="https://example.com" />
+                    </div>
+                    <div class="form-group">
+                        <label for="f_image">Project Image (URL / Path)</label>
+                        <input type="text" id="f_image" placeholder="e.g. /Projects/pitstop-vape.png" />
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-ghost" onclick="resetForm()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="formSubmitBtn">Create Project</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Projects Table -->
+            <div id="tableContainer" class="table-container">
+                <div class="spinner-container" id="tableSpinner">
+                    <div class="spinner"></div>
+                    Loading projects...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== State =====
+        let token = localStorage.getItem("admin_token") || null;
+        let projects = [];
+        let editMode = false;
+        let editingId = null;
+
+        // API URL — detect automatically: same origin as this page
+        const API_URL = window.location.origin + "/api";
+
+        // ===== DOM Elements =====
+        const $ = (id) => document.getElementById(id);
+        const loginSection = $("loginSection");
+        const dashboardSection = $("dashboardSection");
+        const logoutBtn = $("logoutBtn");
+        const formCard = $("formCard");
+        const toggleFormBtn = $("toggleFormBtn");
+
+        // ===== Init =====
+        function init() {
+            if (token) {
+                showDashboard();
+                fetchProjects();
+            } else {
+                showLogin();
+            }
+        }
+
+        function showLogin() {
+            loginSection.classList.remove("hidden");
+            dashboardSection.classList.add("hidden");
+            logoutBtn.classList.add("hidden");
+        }
+
+        function showDashboard() {
+            loginSection.classList.add("hidden");
+            dashboardSection.classList.remove("hidden");
+            logoutBtn.classList.remove("hidden");
+        }
+
+        // ===== Notifications =====
+        function notify(msg, type = "success") {
+            const el = document.createElement("div");
+            el.className = `notification ${type}`;
+            el.textContent = (type === "error" ? "⚠️ " : "✅ ") + msg;
+            $("notifications").prepend(el);
+            setTimeout(() => el.remove(), 4000);
+        }
+
+        // ===== Auth =====
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = $("loginSubmitBtn");
+            btn.disabled = true;
+            btn.textContent = "Memproses...";
+
+            try {
+                const res = await fetch(`${API_URL}/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username: $("username").value,
+                        password: $("password").value,
+                    }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Login gagal");
+
+                token = data.token;
+                localStorage.setItem("admin_token", token);
+                notify("Login berhasil!");
+                showDashboard();
+                fetchProjects();
+            } catch (err) {
+                notify(err.message, "error");
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Sign In";
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem("admin_token");
+            token = null;
+            projects = [];
+            showLogin();
+            notify("Berhasil logout!");
+        }
+
+        // ===== Projects CRUD =====
+        async function fetchProjects() {
+            $("tableContainer").innerHTML = `<div class="spinner-container"><div class="spinner"></div>Loading projects...</div>`;
+
+            try {
+                const res = await fetch(`${API_URL}/projects`);
+                if (!res.ok) throw new Error("Gagal fetch projects");
+                const data = await res.json();
+                projects = Array.isArray(data) ? data : [];
+                renderTable();
+            } catch (err) {
+                $("tableContainer").innerHTML = `<div class="empty-state">Gagal memuat data: ${err.message}</div>`;
+            }
+        }
+
+        function renderTable() {
+            if (projects.length === 0) {
+                $("tableContainer").innerHTML = `<div class="empty-state">Belum ada project yang disimpan di database.</div>`;
+                return;
+            }
+
+            let html = `<table>
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Title</th>
+                        <th>Tech Stack</th>
+                        <th class="td-desc-col">Description</th>
+                        <th style="text-align:center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+            for (const p of projects) {
+                const imgHtml = p.image
+                    ? `<div class="thumb"><img src="${p.image}" alt="${p.title}" onerror="this.style.display='none'"></div>`
+                    : `<div class="thumb"><span class="thumb-placeholder">No Img</span></div>`;
+
+                html += `<tr>
+                    <td>${imgHtml}</td>
+                    <td class="td-title">${escapeHtml(p.title)}</td>
+                    <td class="td-stack">${escapeHtml(p.stack)}</td>
+                    <td class="td-desc">${escapeHtml(p.description)}</td>
+                    <td><div class="td-actions">
+                        <button class="btn btn-warning btn-sm" onclick="handleEdit(${p.ID})">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="handleDelete(${p.ID})">Delete</button>
+                    </div></td>
+                </tr>`;
+            }
+
+            html += `</tbody></table>`;
+            $("tableContainer").innerHTML = html;
+        }
+
+        // ===== Form =====
+        function toggleForm() {
+            if (formCard.classList.contains("hidden")) {
+                resetForm();
+                formCard.classList.remove("hidden");
+                toggleFormBtn.textContent = "Cancel";
+                toggleFormBtn.className = "btn btn-ghost btn-sm";
+            } else {
+                resetForm();
+            }
+        }
+
+        function resetForm() {
+            $("f_title").value = "";
+            $("f_stack").value = "";
+            $("f_desc").value = "";
+            $("f_link").value = "";
+            $("f_image").value = "";
+            editMode = false;
+            editingId = null;
+            $("formTitle").textContent = "Create New Project";
+            $("formSubmitBtn").textContent = "Create Project";
+            formCard.classList.add("hidden");
+            toggleFormBtn.textContent = "+ Add New Project";
+            toggleFormBtn.className = "btn btn-primary btn-sm";
+        }
+
+        function handleEdit(id) {
+            const p = projects.find((x) => x.ID === id);
+            if (!p) return;
+
+            editMode = true;
+            editingId = id;
+            $("f_title").value = p.title;
+            $("f_stack").value = p.stack;
+            $("f_desc").value = p.description;
+            $("f_link").value = p.link || "";
+            $("f_image").value = p.image || "";
+
+            $("formTitle").textContent = `Edit Project: ${p.title}`;
+            $("formSubmitBtn").textContent = "Save Changes";
+            formCard.classList.remove("hidden");
+            toggleFormBtn.textContent = "Cancel";
+            toggleFormBtn.className = "btn btn-ghost btn-sm";
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        async function handleSubmitProject(e) {
+            e.preventDefault();
+
+            const payload = {
+                title: $("f_title").value,
+                stack: $("f_stack").value,
+                description: $("f_desc").value,
+                link: $("f_link").value || null,
+                image: $("f_image").value || null,
+            };
+
+            const url = editMode ? `${API_URL}/projects/${editingId}` : `${API_URL}/projects`;
+            const method = editMode ? "PUT" : "POST";
+
+            try {
+                const res = await fetch(url, {
+                    method,
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Gagal menyimpan project");
+
+                notify(editMode ? "Project berhasil diupdate!" : "Project berhasil ditambahkan!");
+                resetForm();
+                fetchProjects();
+            } catch (err) {
+                notify(err.message, "error");
+            }
+        }
+
+        async function handleDelete(id) {
+            if (!confirm("Apakah Anda yakin ingin menghapus project ini?")) return;
+
+            try {
+                const res = await fetch(`${API_URL}/projects/${id}`, {
+                    method: "DELETE",
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Gagal menghapus project");
+
+                notify("Project berhasil dihapus!");
+                fetchProjects();
+            } catch (err) {
+                notify(err.message, "error");
+            }
+        }
+
+        // ===== Utils =====
+        function escapeHtml(str) {
+            if (!str) return "";
+            const div = document.createElement("div");
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ===== Start =====
+        init();
+    </script>
+</body>
+</html>

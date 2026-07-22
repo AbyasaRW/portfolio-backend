@@ -31,6 +31,11 @@ func CreateProject(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
+	// Tambah ini — validasi field wajib
+	if project.Title == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Title tidak boleh kosong"})
+	}
+
 	config.DB.Create(&project)
 	return c.Status(fiber.StatusCreated).JSON(project)
 }
