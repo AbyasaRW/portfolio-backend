@@ -5,10 +5,11 @@ import (
 	"os"
 
 	"portfolio-backend/config"
+	"portfolio-backend/middleware"
 	"portfolio-backend/models"
 	"portfolio-backend/routes"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 )
 
@@ -20,14 +21,16 @@ func main() {
 
 	config.ConnectDatabase()
 	config.DB.AutoMigrate(&models.Project{}, &models.User{})
+	SeedDatabase()
 
-	router := gin.Default()
-	routes.SetupRoutes(router)
+	app := fiber.New()
+	app.Use(middleware.CORSMiddleware())
+	routes.SetupRoutes(app)
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	router.Run(":" + port)
+	log.Fatal(app.Listen(":" + port))
 }

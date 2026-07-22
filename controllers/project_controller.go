@@ -1,70 +1,64 @@
 package controllers
 
 import (
-	"net/http"
 	"portfolio-backend/config"
 	"portfolio-backend/models"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 )
 
-func GetProjects(c *gin.Context) {
+func GetProjects(c *fiber.Ctx) error {
 	var projects []models.Project
 	config.DB.Find(&projects)
-	c.JSON(http.StatusOK, projects)
+	return c.JSON(projects)
 }
 
-func GetProjectByID(c *gin.Context) {
-	id := c.Param("id")
+func GetProjectByID(c *fiber.Ctx) error {
+	id := c.Params("id")
 	var project models.Project
 
 	if err := config.DB.First(&project, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Project tidak ditemukan"})
-		return
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Project tidak ditemukan"})
 	}
 
-	c.JSON(http.StatusOK, project)
+	return c.JSON(project)
 }
 
-func CreateProject(c *gin.Context) {
+func CreateProject(c *fiber.Ctx) error {
 	var project models.Project
 
-	if err := c.ShouldBindJSON(&project); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+	if err := c.BodyParser(&project); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	config.DB.Create(&project)
-	c.JSON(http.StatusCreated, project)
+	return c.Status(fiber.StatusCreated).JSON(project)
 }
 
-func UpdateProject(c *gin.Context) {
-	id := c.Param("id")
+func UpdateProject(c *fiber.Ctx) error {
+	id := c.Params("id")
 	var project models.Project
 
 	if err := config.DB.First(&project, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Project tidak ditemukan"})
-		return
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Project tidak ditemukan"})
 	}
 
-	if err := c.ShouldBindJSON(&project); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+	if err := c.BodyParser(&project); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	config.DB.Save(&project)
-	c.JSON(http.StatusOK, project)
+	return c.JSON(project)
 }
 
-func DeleteProject(c *gin.Context) {
-	id := c.Param("id")
+func DeleteProject(c *fiber.Ctx) error {
+	id := c.Params("id")
 	var project models.Project
 
 	if err := config.DB.First(&project, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Project tidak ditemukan"})
-		return
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Project tidak ditemukan"})
 	}
 
 	config.DB.Delete(&project)
-	c.JSON(http.StatusOK, gin.H{"message": "Project berhasil dihapus"})
+	return c.JSON(fiber.Map{"message": "Project berhasil dihapus"})
 }
