@@ -1,0 +1,174 @@
+{
+  "experiences": [
+    {
+      "company": "MNCTV",
+      "role": "MCR Operator & Motion Graphic Designer",
+      "full_role": "MCR Operator · Graphic Designer · Video Editor",
+      "place": "Surabaya",
+      "period": "Agustus - November 2023",
+      "categories": "broadcast",
+      "tone": "blue",
+      "initials": "MN",
+      "logo": "/logos/mnctv.jpg",
+      "summary": "Mengelola **grafis on-air live broadcast** dan memproduksi **motion asset** serta video editing untuk sosial media resmi.",
+      "skills": "MCR Operation, Motion Graphics, Video Editing, On-air Graphics",
+      "points": "Mengoperasikan Master Control Room (MCR) untuk mengelola siaran langsung secara real-time, mencakup manajemen grafis on-air, komposisi audio, dan aliran video live.\nMendesain elemen grafis siaran seperti lower-third, bumper, dan overlay visual.\nMembuat dan mengedit konten visual untuk media sosial resmi MNCTV.\nMelakukan video editing untuk konten berita di kanal YouTube MNCTV.",
+      "sort_order": 1
+    },
+    {
+      "company": "MUDIPAT TV",
+      "role": "Web Developer & Creative Multimedia",
+      "full_role": "Web Developer · Graphic Designer · Video Editor · Asisten Head Social Media",
+      "place": "Surabaya",
+      "period": "Januari - Maret 2023",
+      "categories": "tech,broadcast",
+      "tone": "cyan",
+      "initials": "MD",
+      "logo": "/logos/mudipat.jpg",
+      "summary": "Membangun **website profil mudipat.co** serta merancang **visual banner** dan konten promosi video sekolah.",
+      "skills": "Web Development, Graphic Design, Video Editing, Social Media",
+      "points": "Merancang dan mengembangkan website company profile mudipat.co.\nMerencanakan dan mengelola ide konten untuk seluruh platform media sosial resmi MUDIPAT TV.\nMendesain materi visual seperti poster, banner, dan konten promosi.\nMemproduksi dan mengedit video konten untuk platform digital resmi sekolah.",
+      "sort_order": 2
+    },
+    {
+      "company": "Gerira Social Cafe",
+      "role": "Barista & Point of Sales",
+      "full_role": "Barista & Kasir",
+      "place": "Surabaya",
+      "period": "November 2025 - Desember 2025",
+      "categories": "operations",
+      "tone": "orange",
+      "initials": "GS",
+      "logo": "/logos/gerira.png",
+      "summary": "**Pelayanan pelanggan**, pengelolaan **kasir**, dan koordinasi stok logistik kafe.",
+      "skills": "Customer Service, Point of Sales, Supplier Coordination",
+      "points": "Menyajikan minuman berkualitas sesuai standar kafe dan menjaga konsistensi produk.\nMemberikan pelayanan pelanggan yang responsif dan menangani transaksi kasir.\nMengoordinasikan kedatangan supplier operasional kafe.",
+      "sort_order": 3
+    },
+    {
+      "company": "Pitstop Vape",
+      "role": "Store Operations & Social Media Management",
+      "full_role": "Vaporista, Kasir, & Sosial Media Manajemen",
+      "place": "Surabaya",
+      "period": "Desember 2025 - Juli 2026",
+      "categories": "operations",
+      "tone": "violet",
+      "initials": "PV",
+      "logo": "/logos/pitstop.png",
+      "summary": "Mengelola **operasional harian**, inventaris toko, serta **strategi konten digital** untuk brand awareness.",
+      "skills": "Inventory Control, POS, Content Strategy",
+      "points": "Bertanggung jawab atas pelayanan pelanggan, penjualan produk, dan transaksi kasir harian.\nMengelola stok produk serta memastikan ketersediaan barang.\nMengembangkan dan mengelola konten media sosial untuk brand awareness.",
+      "sort_order": 4
+    }
+  ],
+  "tools": [
+    {
+      "group": "frontend",
+      "name": "Next.js",
+      "icon": "/tools/nextjs.svg",
+      "sort_order": 1
+    },
+    {
+      "group": "frontend",
+      "name": "React",
+      "icon": "/tools/react.svg",
+      "sort_order": 2
+    },
+    {
+      "group": "frontend",
+      "name": "HTML5",
+      "icon": "/tools/html5.svg",
+      "sort_order": 3
+    },
+    {
+      "group": "frontend",
+      "name": "CSS3",
+      "icon": "/tools/css3.svg",
+      "sort_order": 4
+    },
+    {
+      "group": "frontend",
+      "name": "Tailwind CSS",
+      "icon": "/tools/tailwindcss.svg",
+      "sort_order": 5
+    },
+    {
+      "group": "backend",
+      "name": "PHP",
+      "icon": "/tools/php.svg",
+      "sort_order": 1
+    },
+    {
+      "group": "backend",
+      "name": "MySQL",
+      "icon": "/tools/mysql.svg",
+      "sort_order": 2
+    },
+    {
+      "group": "backend",
+      "name": "Go",
+      "icon": "/tools/go.svg",
+      "sort_order": 3
+    },
+    {
+      "group": "backend",
+      "name": "C++",
+      "icon": "/tools/cplusplus.svg",
+      "sort_order": 4
+    },
+    {
+      "group": "design",
+      "name": "Figma",
+      "icon": "/tools/figma.svg",
+      "sort_order": 1
+    },
+    {
+      "group": "design",
+      "name": "Photoshop",
+      "icon": "/tools/photoshop.svg",
+      "sort_order": 2
+    },
+    {
+      "group": "design",
+      "name": "Illustrator",
+      "icon": "/tools/illustrator.svg",
+      "sort_order": 3
+    },
+    {
+      "group": "design",
+      "name": "Premiere Pro",
+      "icon": "/tools/premiere.svg",
+      "sort_order": 4
+    },
+    {
+      "group": "dev",
+      "name": "VS Code",
+      "icon": "/tools/vscode.svg",
+      "sort_order": 1
+    },
+    {
+      "group": "dev",
+      "name": "Git",
+      "icon": "/tools/git.svg",
+      "sort_order": 2
+    },
+    {
+      "group": "dev",
+      "name": "Laragon",
+      "icon": "/tools/laragon.svg",
+      "sort_order": 3
+    },
+    {
+      "group": "dev",
+      "name": "GNS3",
+      "icon": "/tools/gns3.png",
+      "sort_order": 4
+    },
+    {
+      "group": "dev",
+      "name": "Excel",
+      "icon": "/tools/excel.svg",
+      "sort_order": 5
+    }
+  ]
+}

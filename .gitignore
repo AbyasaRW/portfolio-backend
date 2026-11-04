@@ -3,3 +3,6 @@
 tmp/
 vendor/
 portofolio-next/
+.env.*
+!.env.example
+*.log

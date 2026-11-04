@@ -26,8 +26,9 @@ func main() {
 	}
 
 	config.ConnectDatabase()
-	config.DB.AutoMigrate(&models.Project{}, &models.User{})
+	config.DB.AutoMigrate(&models.Project{}, &models.User{}, &models.Experience{}, &models.Tool{})
 	SeedDatabase()
+	SeedContent()
 
 	app := fiber.New()
 	app.Use(middleware.CORSMiddleware())

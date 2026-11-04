@@ -7,9 +7,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// GetProjects mengembalikan semua project, urut sesuai sort_order (lalu id).
+// Endpoint ini publik: dipakai frontend untuk menampilkan portfolio.
 func GetProjects(c *fiber.Ctx) error {
-	var projects []models.Project
-	config.DB.Find(&projects)
+	projects := []models.Project{} // kosong dikirim sebagai [] (bukan null)
+	config.DB.Order("sort_order ASC, id ASC").Find(&projects)
 	return c.JSON(projects)
 }
 
@@ -31,7 +33,9 @@ func CreateProject(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	// Tambah ini — validasi field wajib
+	project.Normalize()
+
+	// Validasi field wajib
 	if project.Title == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Title tidak boleh kosong"})
 	}
@@ -48,8 +52,17 @@ func UpdateProject(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Project tidak ditemukan"})
 	}
 
+	// Simpan identitas asli supaya body request tidak bisa menimpa ID / created_at.
+	original := project.Model
+
 	if err := c.BodyParser(&project); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+	project.Model = original
+	project.Normalize()
+
+	if project.Title == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Title tidak boleh kosong"})
 	}
 
 	config.DB.Save(&project)

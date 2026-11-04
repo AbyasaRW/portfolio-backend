@@ -1,28 +1,25 @@
-# Stage 1: Build binary
-FROM golang:alpine AS builder
+ARG GO_VERSION=1.26.5
+ARG ALPINE_VERSION=3.22
+
+FROM golang:${GO_VERSION}-alpine AS builder
 
 WORKDIR /app
 
-# Copy dependency files
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy source code
 COPY . .
-
-# Build the static binary
 RUN CGO_ENABLED=0 GOOS=linux go build -o portfolio-backend .
 
-# Stage 2: Minimal runtime image
-FROM alpine:latest
+FROM alpine:${ALPINE_VERSION}
 
 WORKDIR /app
+RUN apk add --no-cache ca-certificates \
+    && addgroup -S app \
+    && adduser -S -G app app
 
-# Copy binary from builder
-COPY --from=builder /app/portfolio-backend .
+COPY --from=builder --chown=app:app /app/portfolio-backend .
 
-# Expose port
+USER app
 EXPOSE 8080
-
-# Run the app
 CMD ["./portfolio-backend"]

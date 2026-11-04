@@ -1,143 +1,133 @@
-# Portfolio Backend API (Go + Fiber + GORM + PostgreSQL)
+# Portfolio Backend (Go + Fiber + GORM + PostgreSQL)
 
-Backend RESTful API untuk mengelola data portofolio dan menyediakan autentikasi admin. Dibuat menggunakan **Go (Golang)**, **Go Fiber v2**, **GORM ORM**, dan database **PostgreSQL**.
-
----
-
-## 🚀 Fitur Utama
-
-- **Authentication & Authorization**: Registrasi & Login Admin menggunakan bcrypt password hashing dan JWT (JSON Web Token).
-- **CRUD Project Management**: Rest API lengkap untuk Menampilkan, Menambah, Mengubah, dan Menghapus data project.
-- **Embedded Admin Panel (SPA)**: Dashboard admin bawaan yang di-embed langsung ke dalam Go binary (`/admin`) menggunakan `embed.FS`.
-- **Production-Ready CORS**: Dynamic & secure CORS middleware yang di-whitelist khusus untuk domain Vercel Frontend dan fleksibel lewat environment variable.
-- **Database Support**: Mendukung koneksi PostgreSQL lokal maupun cloud deployment (seperti Railway, Render, Fly.io) melalui `DATABASE_URL` dan konfigurasi SSL.
-- **Automated Testing**: Dilengkapi dengan White-box Unit Test (HTTP Test `app.Test()`, Mock Database `go-sqlmock`, dan Middleware CORS Test).
-
----
-
-## 🛠️ Teknologi yang Digunakan
-
-- **Language**: Go (Golang) 1.26+
-- **Web Framework**: [Go Fiber v2](https://gofiber.io/)
-- **ORM**: [GORM](https://gorm.io/)
-- **Database**: PostgreSQL
-- **Authentication**: JWT (`golang-jwt/jwt/v5`) & Bcrypt (`golang.org/x/crypto`)
-- **Testing**: `stretchr/testify` & `DATA-DOG/go-sqlmock`
-
----
-
-## 📁 Struktur Folder Project
+API untuk portfolio. Frontend (Next.js) mengambil **Featured Projects**, **Pengalaman**, dan **Tools** dari sini,
+dan **Admin Panel** di `/admin` dipakai untuk mengelolanya tanpa menyentuh kode.
 
 ```text
-portfolio-backend/
-├── admin/                      # Embedded HTML/JS Single Page Admin Panel
-│   └── index.html
-├── config/                     # Konfigurasi database & Mock DB Test
-│   ├── database.go
-│   └── database_test.go
-├── controllers/                # Logic Handler / Controller API & Testing
-│   ├── admin_handler.go
-│   ├── auth_controller.go
-│   ├── project_controller.go
-│   └── project_controller_test.go
-├── middleware/                 # Middleware Auth & CORS
-│   ├── auth_middleware.go
-│   ├── cors_middleware.go
-│   └── cors_test.go
-├── models/                     # GORM Database Models (User, Project)
-│   ├── project.go
-│   └── user.go
-├── routes/                     # Definisi Endpoint API
-│   └── routes.go
-├── utils/                      # Helper JWT Token
-│   └── jwt.go
-├── .env.example                # Template Environment Variables
-├── Dockerfile                  # Multi-stage Docker build config
-├── main.go                     # Entrypoint aplikasi
-└── seed.go                     # Data seeder awal (Projects & Admin User)
+Pengunjung ─► Frontend (Next.js :3000) ──GET /api/projects|experiences|tools──► Backend (Go :8080) ──► PostgreSQL
+                       ▲ cadangan: data/*.ts di frontend bila backend mati
+Admin ───────► Admin Panel (:8080/admin) ──POST/PUT/DELETE (token JWT)──► Backend
 ```
 
----
+## Menjalankan (pengembangan lokal)
 
-## 📌 API Endpoints
+Butuh: Go 1.26+, PostgreSQL. Dari folder `backend`:
 
-### 🔓 Public Routes (Tanpa Auth)
+```powershell
+# 1. Database khusus dev (port 5433, terpisah dari PostgreSQL lain, tanpa password)
+.\scripts\dev-db.ps1 start
 
-| Method | Endpoint | Deskripsi |
-| --- | --- | --- |
-| `POST` | `/api/register` | Registrasi user admin baru |
-| `POST` | `/api/login` | Login admin & mendapatkan JWT token |
-| `GET` | `/api/projects` | Mengambil semua daftar project |
-| `GET` | `/api/projects/:id` | Mengambil detail project berdasarkan ID |
-| `GET` | `/admin` | Mengakses Embedded Dashboard Admin (UI) |
+# 2. Salin pengaturan lalu isi
+copy .env.example .env        # contoh dev: DB_PORT=5433, DB_USER=portfolio_dev, DB_PASSWORD=apa-saja
 
-### 🔒 Protected Routes (Butuh Header `Authorization: Bearer <token>`)
-
-| Method | Endpoint | Deskripsi |
-| --- | --- | --- |
-| `POST` | `/api/projects` | Menambahkan project baru |
-| `PUT` | `/api/projects/:id` | Mengubah data project berdasarkan ID |
-| `DELETE` | `/api/projects/:id` | Menghapus project berdasarkan ID |
-
----
-
-## 💻 Panduan Jalankan Secara Lokal
-
-### 1. Prasyarat
-- Installed Go 1.20+
-- Installed PostgreSQL (atau via Docker)
-
-### 2. Clone & Install Dependencies
-```bash
-git clone https://github.com/AbyasaRW/portfolio-backend.git
-cd portfolio-backend
-go mod download
+# 3. Jalankan
+go run .
 ```
 
-### 3. Setup Environment Variables
-Buat file `.env` di root project berdasarkan `.env.example`:
-```env
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=your_password
-DB_NAME=portfolio_db
-DB_SSLMODE=disable
+Backend aktif di `http://localhost:8080`, Admin Panel di `http://localhost:8080/admin`.
+Saat pertama jalan: tabel dibuat otomatis, data awal di-*seed* (5 project, 4 pengalaman, 18 tools), dan admin
+dibuat dari `ADMIN_USERNAME` / `ADMIN_PASSWORD` bila tabel user masih kosong.
 
-JWT_SECRET=supersecretjwtkey123
-PORT=8080
-ALLOWED_ORIGINS=http://localhost:3000
+`.\scripts\dev-db.ps1 stop | status | reset` untuk mematikan, mengecek, atau mengosongkan database dev.
+
+> Sudah punya PostgreSQL sendiri? Cukup isi `DB_*` di `.env` (atau `DATABASE_URL`) dan lewati langkah 1.
+
+### Aman untuk database yang sudah berisi data
+
+Migrasi hanya **menambah** tabel/kolom baru (`experiences`, `tools`, dan kolom `category`, `accent`, `image_fit`,
+`sort_order` di `projects`). Data lama tidak diubah. Data awal hanya diisi bila tabelnya belum pernah berisi apa pun
+(termasuk yang sudah dihapus), jadi item yang sengaja kamu hapus lewat Admin tidak muncul lagi saat backend dinyalakan ulang.
+Tetap buat cadangan (`pg_dump`) sebelum deploy.
+
+## Pengaturan (`.env`)
+
+| Variabel | Fungsi |
+| --- | --- |
+| `DB_HOST` `DB_PORT` `DB_USER` `DB_PASSWORD` `DB_NAME` `DB_SSLMODE` | Koneksi PostgreSQL. Atau pakai satu `DATABASE_URL`. |
+| `JWT_SECRET` | Kunci penandatangan token login. **Wajib kuat di produksi.** |
+| `ADMIN_USERNAME` `ADMIN_PASSWORD` | Akun admin pertama (dibuat sekali bila belum ada user). |
+| `ENABLE_REGISTRATION` | `true` membuka `/api/register`. Biarkan `false`. |
+| `ALLOWED_ORIGINS` | Domain frontend yang boleh memanggil API (CORS), pisahkan dengan koma. |
+| `SITE_URL` | Alamat website portfolio. Admin Panel memakainya untuk thumbnail gambar dan tautan "Lihat website". |
+| `PORT` | Port backend (default 8080). |
+
+`.env` berisi rahasia dan **tidak boleh di-commit** (sudah ada di `.gitignore`).
+
+## Endpoint
+
+| Method | Path | Auth | Fungsi |
+| --- | --- | --- | --- |
+| GET | `/api/projects` `/api/experiences` `/api/tools` | publik | Daftar data, urut `sort_order` lalu `id`. Kosong = `[]` |
+| GET | `/api/projects/:id` | publik | Satu project |
+| GET | `/api/site` | publik | `{ "site_url": "..." }` untuk Admin Panel |
+| POST | `/api/login` | publik | `{username,password}` → `{token}` (berlaku 24 jam) |
+| POST | `/api/register` | publik* | *Nonaktif (404) kecuali `ENABLE_REGISTRATION=true` |
+| POST | `/api/projects` `/api/experiences` `/api/tools` | token | Tambah |
+| PUT | `/api/projects/:id` `/api/experiences/:id` `/api/tools/:id` | token | Ubah |
+| DELETE | `/api/projects/:id` `/api/experiences/:id` `/api/tools/:id` | token | Hapus (soft delete) |
+
+Token dikirim sebagai header `Authorization: Bearer <token>`.
+
+### Bentuk data
+
+Semua isian dirapikan (spasi dibuang, nilai tidak valid diganti default). `ID` pada body diabaikan: tidak bisa menimpa ID asli.
+
+**Project** `{ title*, stack, description, link, image, category, accent, image_fit, sort_order }`
+- `accent`: `blue` `cyan` `violet` `orange` `slate` (lainnya → `blue`)
+- `image_fit`: `cover` atau `contain` (lainnya → `cover`)
+- `image`: path di folder `public/` **frontend** (mis. `/Projects/x.png`) atau URL penuh
+
+**Pengalaman** `{ company*, role, full_role, place, period, categories, tone, initials, logo, summary, skills, points, sort_order }`
+- `categories`: `broadcast` `tech` `operations`, pisahkan koma (yang tidak dikenal dibuang)
+- `tone`: `blue` `cyan` `orange` `violet` · `skills`: pisahkan koma · `points`: satu tugas per baris
+- `summary`: `**kata**` ditampilkan tebal di website
+
+**Tool** `{ name*, icon, group, sort_order }`
+- `group`: `frontend` `backend` `design` `dev` (lainnya → `frontend`) · `icon`: mis. `/tools/nextjs.svg`
+
+(`*` = wajib diisi.)
+
+## Struktur
+
+```text
+backend/
+├── main.go             Titik masuk: koneksi DB, migrasi, seed, route, Admin Panel
+├── seed.go             Data awal project + admin, dan backfill kolom baru
+├── seed_content.go     Data awal pengalaman & tools (dibaca dari seed_content.json)
+├── seed_content.json   Dibuat otomatis: node --no-warnings scripts/gen-seed.mjs (dari data frontend)
+├── config/             Koneksi database
+├── models/             Struktur tabel + Normalize(): Project, Experience, Tool, User
+├── controllers/        Logika endpoint (project, content = CRUD generik pengalaman & tools, auth, site, admin)
+├── middleware/         Cek token JWT, CORS
+├── routes/             Daftar endpoint
+├── utils/              Pembuat/pemeriksa JWT
+├── admin/              Admin Panel (index.html, admin.css, js/*.js) — ikut ter-embed di binary
+└── scripts/            dev-db.ps1 (PostgreSQL dev), gen-seed.mjs (membuat seed_content.json)
 ```
 
-### 4. Jalankan Aplikasi
-```bash
-go run main.go
+Bila data di `frontend/data/` (profile, experience, tools) berubah, jalankan ulang `gen-seed.mjs`
+agar data awal ikut berubah, lalu `go test ./...`.
+
+## Admin Panel
+
+`http://localhost:8080/admin` — masuk dengan akun admin. Tiga tab: **Projects**, **Pengalaman**, **Tools**.
+
+- **Baru / Ubah** membuka editor dengan **pratinjau langsung** yang meniru tampilan di website.
+- **Hapus** meminta konfirmasi. Esc atau klik di luar menutup editor tanpa menyimpan.
+- Perubahan tampil di website dalam ±30 detik (frontend menyimpan cache 30 detik).
+- Isi data ditampilkan sebagai teks biasa, jadi tidak bisa menyisipkan HTML/skrip (XSS).
+- Kode dipecah per modul di `admin/js/` (`api`, `ui`, `resources`, `editor`, `app`). Menambah jenis konten baru
+  cukup menambah satu objek di `resources.js`.
+
+## Test
+
+```powershell
+go test ./...          # unit test (database ditiru dengan sqlmock, tidak butuh PostgreSQL)
+go vet ./...
 ```
-*Aplikasi akan otomatis melakukan AutoMigrate tabel & Seeding data default jika tabel masih kosong (Default Login: `username: admin`, `password: admin123`).*
 
----
+## Deploy
 
-## 🧪 Jalankan Unit Test (White-Box Testing)
-
-Untuk menjalankan seluruh rangkaian pengujian otomatis:
-
-```bash
-# Run all tests
-go test ./... -v
-
-# Run tests with coverage summary
-go test ./... -cover
-```
-
----
-
-## 🌐 Deployment (Railway)
-
-Project ini telah dilengkapi dengan `Dockerfile` multi-stage build yang siap di-deploy ke Railway/Render/Fly.io.
-
-1. Hubungkan repository GitHub ke Railway.
-2. Tambahkan Plugin Database **PostgreSQL** di Railway.
-3. Tambahkan Environment Variable di Railway:
-   - `JWT_SECRET` : Secret key produksi kamu.
-   - `ALLOWED_ORIGINS` : `https://abyasa-portfolio.vercel.app` (domain Vercel frontend kamu).
-4. Railway secara otomatis membaca `Dockerfile` dan menyambungkan `DATABASE_URL`.
+`Dockerfile` multi-stage siap dipakai. Di produksi isi `DATABASE_URL` (atau `DB_*`), `JWT_SECRET`,
+`ADMIN_PASSWORD`, `ALLOWED_ORIGINS` (domain frontend), dan `SITE_URL` (domain website). Jangan memakai nilai contoh
+dari `.env` lokal.

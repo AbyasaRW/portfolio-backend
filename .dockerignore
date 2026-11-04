@@ -1,0 +1,8 @@
+.git
+.gitignore
+.env*
+coverage.out
+*.exe
+tmp
+vendor
+README.md
